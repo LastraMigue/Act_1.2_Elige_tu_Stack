@@ -1,64 +1,32 @@
-# Informe de Consultoría Técnica
-## Arquitectura y Ecosistema de Desarrollo Web
+# Informe de Consultoría Técnica: Arquitectura Web
 
 ---
 
 ## 1. Cliente vs. Servidor
-
-El código de una aplicación web se ejecuta en dos entornos distintos:
-
-*   **El Cliente (Navegador):** Es el entorno del usuario, donde corren **HTML, CSS y JavaScript** para mostrar la interfaz gráfica y gestionar la interacción.
-*   **El Servidor (Backend):** Es la máquina remota de la empresa. Aquí se ejecuta **PHP** y se gestionan elementos críticos como la **base de datos, la lógica de negocio y la seguridad**.
-
-> **Regla de Oro de la Seguridad Web:**
-> **Nunca confiar en los datos que vienen del cliente.**
->
-> El navegador está bajo control total del usuario, por lo que cualquier precio, validación o dato enviado desde él puede ser manipulado (por ejemplo, forzando que un producto cueste 0 €). 
-> 
-> **Solución:** Toda validación crítica y todo cálculo financiero deben repetirse y verificarse siempre en el servidor, el único entorno cerrado y confiable.
+- **Cliente (Navegador):** Ejecuta las tecnologías de interfaz (HTML/CSS/JS). Al residir en el equipo del usuario, puede ser manipulado fácilmente.
+- **Servidor (Backend):** Máquina remota segura donde reside la lógica de negocio (PHP) y la base de datos.
+- **Seguridad Web:** La regla de oro es *"nunca confiar en los datos que vienen del cliente"*. Toda validación crítica (como el precio de un producto) debe verificarse siempre en el servidor para evitar fraudes, al ser el único entorno bajo nuestro control total.
 
 ---
 
 ## 2. Web Estática vs. Dinámica
-
-Existen dos enfoques principales a la hora de servir páginas web:
-
-*   **Web Estática:** Entrega el mismo archivo HTML a todos los usuarios.
-    *   *Ventaja:* Es muy rápida.
-    *   *Desventaja:* Es completamente inflexible.
-*   **Web Dinámica:** Construye la página en cada petición, consultando la base de datos y adaptando el contenido a cada usuario.
-
-### La necesidad del dinamismo en E-commerce
-Para una tienda online, la generación **dinámica** es totalmente imprescindible. Permite:
-*   Reconocer usuarios autenticados.
-*   Mantener el carrito de la compra entre sesiones.
-*   Actualizar el stock en tiempo real.
-*   Ofrecer recomendaciones personalizadas.
-
-> **Evolución Tecnológica:** Esta misma base dinámica es la que permite evolucionar hacia arquitecturas híbridas (como **SPA + API**), donde el servidor envía datos en formato JSON a una aplicación cliente (como React o Vue) para lograr una experiencia de usuario fluida y sin recargas de página.
+- **Web Estática:** Entrega el mismo contenido pregenerado a todos. Es rápida y barata de alojar, pero inflexible.
+- **Web Dinámica:** El servidor procesa datos en tiempo real y construye respuestas a medida, siendo necesario que se compile.
+- **Justificación de Negocio:** Para una tienda online, la web dinámica es obligatoria. Permite gestionar autenticación, carritos y control de stock en tiempo real. Además, es la base para evolucionar hacia **arquitecturas híbridas** actuales, donde el servidor envía datos en formato JSON a aplicaciones cliente (SPA como React o Vue).
 
 ---
 
-## 3. La Infraestructura: Servidores
-
-El procesamiento de las peticiones web se divide en varias capas:
-
-1.  **El Servidor Web (Nginx / Apache):** Es la puerta de entrada del negocio. Recibe las peticiones HTTP, sirve directamente los archivos estáticos (imágenes, CSS, JS) y redirige las peticiones dinámicas al motor de procesamiento.
-2.  **PHP-FPM (FastCGI Process Manager):** Es el motor de procesamiento que ha sustituido al antiguo modelo **CGI**.
-    *   *El problema de CGI:* Creaba un proceso nuevo por cada visitante, lo que consumía muchos recursos y colapsaba ante picos de tráfico.
-    *   *La solución de PHP-FPM:* Mantiene un *pool* de procesos ya activos y listos para trabajar, reduciendo drásticamente el consumo de memoria y permitiendo soportar miles de visitas simultáneas (como en un Black Friday).
-3.  **El Framework (Laravel):** Sobre esta infraestructura base, asume el rol de servidor de aplicaciones. Coordina la conexión a la base de datos, la gestión de sesiones de usuario, la seguridad y la formulación de las respuestas HTTP, apoyándose en la agilidad y el rendimiento que le proporciona PHP-FPM.
+## 3. La Infraestructura (Servidores)
+- **Servidor Web (Apache / Nginx):** Es la puerta de entrada. Su función es despachar archivos estáticos masivamente y redirigir las peticiones complejas al motor de procesamiento.
+- **Mecanismos de Ejecución (PHP-FPM):** Sustituye al antiguo modelo **CGI**. Mientras CGI abría un proceso nuevo por cada usuario (consumiendo toda la memoria en picos de tráfico), **PHP-FPM** utiliza un sistema de *pool de procesos* ya activos y reciclables. Esto garantiza máxima eficiencia y resistencia ante miles de visitas concurrentes.
+- **Framework (Laravel):** Asume el rol de servidor de aplicaciones. Funciona por encima de PHP-FPM para tomar el control de la petición, coordinar la conexión a la base de datos y gestionar las sesiones del usuario de forma estructurada.
 
 ---
 
 ## 4. Evaluación de Herramientas: PHP y Laravel 12
+Recomendamos apostar por PHP junto con **Laravel 12**. Un desarrollo "nativo" (sin framework) es propenso a fallos graves de seguridad y tiene un coste de mantenimiento altísimo a largo plazo.
 
-Se recomienda firmemente construir el proyecto utilizando **PHP** junto con el framework **Laravel 12**.
-
-> **Laravel vs. Desarrollo Nativo:** Laravel es el estándar actual de la industria. Optar por él es infinitamente superior a desarrollar una solución "nativa" sin framework, la cual sería mucho más propensa a fallos de seguridad y extremadamente difícil de mantener a largo plazo.
-
-### Ventajas clave de Laravel 12:
-
-- **Patrón MVC** (Modelo-Vista-Controlador): separa la gestión de datos (Eloquent ORM), la interfaz (Blade) y la lógica de negocio (Controlador), permitiendo rediseñar la web sin arriesgar los cálculos de facturación.
-- **Seguridad por defecto:** protección nativa frente a inyección SQL, XSS y CSRF, aplicada automáticamente sin depender de que el equipo la active manualmente.
-- **Ecosistema completo:** módulos integrados de autenticación, APIs REST y tareas programadas (como recordatorios de carritos abandonados), que reducen el tiempo y coste de desarrollo.
+**Ventajas clave de Laravel 12:**
+1. **Patrón Arquitectónico MVC:** Separa de forma limpia los datos (Modelo), la interfaz (Vista) y la lógica de negocio (Controlador), permitiendo ampliar la tienda sin riesgo de romper cálculos existentes.
+2. **Seguridad por defecto:** Implementa protección nativa y automática contra las vulnerabilidades web más críticas (Inyección SQL, ataques XSS y CSRF).
+3. **Ecosistema Integrado:** Incluye módulos listos para usar (autenticación robusta, desarrollo de APIs, programación de tareas de servidor) que aceleran el desarrollo drásticamente.
